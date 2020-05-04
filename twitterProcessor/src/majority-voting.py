@@ -1,6 +1,6 @@
 import glob
 import numpy as np
-import utils
+from . import utils
 
 # Takes majority vote of a number of CSV prediction files.
 
@@ -15,7 +15,7 @@ def main():
             lines = f.readlines()[1:]
             current_preds = np.array([int(l.split(',')[1]) for l in lines])
             predictions[range(NUM_PREDICTION_ROWS), current_preds] += 1
-    print predictions[:50]
+    print(predictions[:50])
     predictions = np.argmax(predictions, axis=1)
     results = zip(map(str, range(NUM_PREDICTION_ROWS)), predictions)
     utils.save_results_to_csv(results, 'majority-voting.csv')

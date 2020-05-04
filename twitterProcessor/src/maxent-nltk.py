@@ -3,7 +3,7 @@ import random
 import pickle
 import sys
 import numpy as np
-from utils import save_results_to_csv
+from .utils import save_results_to_csv
 
 
 TRAIN_PROCESSED_FILE = '../train-processed.csv'
@@ -33,13 +33,16 @@ def get_data_from_file(file_name, isTrain=True):
             data.append((bag_of_words, tag))
     return data
 
+
 def split_data(tweets, validation_split=0.1):
     index = int((1 - validation_split) * len(tweets))
     random.shuffle(tweets)
     return tweets[:index], tweets[index:]
 
+
 def list_to_dict(words_list):
     return dict([(word, True) for word in words_list])
+
 
 if __name__ == '__main__':
     train = True
@@ -63,11 +66,11 @@ if __name__ == '__main__':
         if determined_label!=label:
             count+=int(1)
     accuracy = (len(validation_set)-count)/len(validation_set)
-    print 'Validation set accuracy:%.4f'% (accuracy)
+    print('Validation set accuracy:%.4f'% (accuracy))
     f = open('maxEnt_classifier.pickle', 'wb')
     pickle.dump(classifier, f)
     f.close()
-    print '\nPredicting for test data'
+    print('\nPredicting for test data')
     test_data = get_data_from_file(test_csv_file, isTrain=False)
     test_set_formatted = [(list_to_dict(element[0]), element[1]) for element in test_data]
     tweet_id = int(0)
@@ -78,5 +81,4 @@ if __name__ == '__main__':
         results.append((str(tweet_id), label))
         tweet_id += int(1)
     save_results_to_csv(results, 'maxent.csv')
-    print '\nSaved to maxent.csv'
-    
+    print('\nSaved to maxent.csv')

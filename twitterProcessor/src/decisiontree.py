@@ -1,4 +1,4 @@
-import utils
+from . import utils
 import random
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
@@ -29,7 +29,7 @@ def get_feature_vector(tweet):
     uni_feature_vector = []
     bi_feature_vector = []
     words = tweet.split()
-    for i in xrange(len(words) - 1):
+    for i in range(len(words) - 1):
         word = words[i]
         next_word = words[i + 1]
         if unigrams.get(word):
@@ -45,7 +45,7 @@ def get_feature_vector(tweet):
 
 def extract_features(tweets, batch_size=500, test_file=True, feat_type='presence'):
     num_batches = int(np.ceil(len(tweets) / float(batch_size)))
-    for i in xrange(num_batches):
+    for i in range(num_batches):
         batch = tweets[i * batch_size: (i + 1) * batch_size]
         features = lil_matrix((batch_size, VOCAB_SIZE))
         labels = np.zeros(batch_size)
@@ -93,7 +93,7 @@ def process_tweets(csv_file, test_file=True):
         list: Of tuples
     """
     tweets = []
-    print 'Generating feature vectors'
+    print('Generating feature vectors')
     with open(csv_file, 'r') as csv:
         lines = csv.readlines()
         total = len(lines)
@@ -108,7 +108,7 @@ def process_tweets(csv_file, test_file=True):
             else:
                 tweets.append((tweet_id, int(sentiment), feature_vector))
             utils.write_status(i + 1, total)
-    print '\n'
+    print('\n')
     return tweets
 
 
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         random.shuffle(tweets)
         train_tweets = tweets
     del tweets
-    print 'Extracting features & training batches'
+    print('Extracting features & training batches')
     clf = DecisionTreeClassifier(max_depth=25)
     batch_size = len(train_tweets)
     i = 1
@@ -136,8 +136,8 @@ if __name__ == '__main__':
             tfidf = apply_tf_idf(training_set_X)
             training_set_X = tfidf.transform(training_set_X)
         clf.fit(training_set_X, training_set_y)
-    print '\n'
-    print 'Testing'
+    print('\n')
+    print('Testing')
     if TRAIN:
         correct, total = 0, len(val_tweets)
         i = 1
@@ -150,13 +150,13 @@ if __name__ == '__main__':
             correct += np.sum(prediction == val_set_y)
             utils.write_status(i, n_val_batches)
             i += 1
-        print '\nCorrect: %d/%d = %.4f %%' % (correct, total, correct * 100. / total)
+        print('\nCorrect: %d/%d = %.4f %%' % (correct, total, correct * 100. / total))
     else:
         del train_tweets
         test_tweets = process_tweets(TEST_PROCESSED_FILE, test_file=True)
         n_test_batches = int(np.ceil(len(test_tweets) / float(batch_size)))
         predictions = np.array([])
-        print 'Predicting batches'
+        print('Predicting batches')
         i = 1
         for test_set_X, _ in extract_features(test_tweets, test_file=True, feat_type=FEAT_TYPE):
             if FEAT_TYPE == 'frequency':
@@ -168,4 +168,4 @@ if __name__ == '__main__':
         predictions = [(str(j), int(predictions[j]))
                        for j in range(len(test_tweets))]
         utils.save_results_to_csv(predictions, 'decisiontree.csv')
-        print '\nSaved to decisiontree.csv'
+        print('\nSaved to decisiontree.csv')

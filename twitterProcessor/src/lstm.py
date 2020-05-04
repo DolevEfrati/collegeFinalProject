@@ -5,7 +5,7 @@ from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.layers import LSTM
-import utils
+from . import utils
 from keras.preprocessing.sequence import pad_sequences
 
 # Performs classification using LSTM network.
@@ -19,7 +19,7 @@ dim = 200
 
 
 def get_glove_vectors(vocab):
-    print 'Looking for GLOVE vectors'
+    print('Looking for GLOVE vectors')
     glove_vectors = {}
     found = 0
     with open(GLOVE_FILE, 'r') as glove_file:
@@ -31,8 +31,8 @@ def get_glove_vectors(vocab):
                 vector = [float(e) for e in tokens[1:]]
                 glove_vectors[word] = np.array(vector)
                 found += 1
-    print '\n'
-    print 'Found %d words in GLOVE' % found
+    print('\n')
+    print('Found %d words in GLOVE' % found)
     return glove_vectors
 
 
@@ -52,7 +52,7 @@ def get_feature_vector(tweet):
 def process_tweets(csv_file, test_file=True):
     tweets = []
     labels = []
-    print 'Generating feature vectors'
+    print('Generating feature vectors')
     with open(csv_file, 'r') as csv:
         lines = csv.readlines()
         total = len(lines)
@@ -68,7 +68,7 @@ def process_tweets(csv_file, test_file=True):
                 tweets.append(feature_vector)
                 labels.append(int(sentiment))
             utils.write_status(i + 1, total)
-    print '\n'
+    print('\n')
     return tweets, np.array(labels)
 
 
@@ -106,11 +106,11 @@ if __name__ == '__main__':
         filepath = "./models/lstm-{epoch:02d}-{loss:0.3f}-{acc:0.3f}-{val_loss:0.3f}-{val_acc:0.3f}.hdf5"
         checkpoint = ModelCheckpoint(filepath, monitor="loss", verbose=1, save_best_only=True, mode='min')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=0.000001)
-        print model.summary()
+        print(model.summary())
         model.fit(tweets, labels, batch_size=128, epochs=5, validation_split=0.1, shuffle=True, callbacks=[checkpoint, reduce_lr])
     else:
         model = load_model(sys.argv[1])
-        print model.summary()
+        print(model.summary())
         test_tweets, _ = process_tweets(TEST_PROCESSED_FILE, test_file=True)
         test_tweets = pad_sequences(test_tweets, maxlen=max_length, padding='post')
         predictions = model.predict(test_tweets, batch_size=128, verbose=1)

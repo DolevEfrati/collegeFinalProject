@@ -1,4 +1,4 @@
-import utils
+from . import utils
 import random
 import numpy as np
 from sklearn.naive_bayes import MultinomialNB
@@ -24,8 +24,9 @@ unigrams = utils.top_n_words(FREQ_DIST_FILE, UNIGRAM_SIZE)
 if USE_BIGRAMS:
     bigrams = utils.top_n_bigrams(BI_FREQ_DIST_FILE, BIGRAM_SIZE)
 
+
 def clfPredicator(csv_file, test_file=True):
-    print 'Start training naivebayes!\n'
+    print('Start training naivebayes!\n')
     TRAIN_PROCESSED_FILE=csv_file
     np.random.seed(1337)
     tweets = process_tweets(TRAIN_PROCESSED_FILE, test_file=False)
@@ -35,7 +36,7 @@ def clfPredicator(csv_file, test_file=True):
         random.shuffle(tweets)
         train_tweets = tweets
     del tweets
-    print 'Extracting features & training batches'
+    print('Extracting features & training batches')
     clf = MultinomialNB()
     batch_size = len(train_tweets)
     i = 1
@@ -47,14 +48,15 @@ def clfPredicator(csv_file, test_file=True):
             tfidf = apply_tf_idf(training_set_X)
             training_set_X = tfidf.transform(training_set_X)
         clf.partial_fit(training_set_X, training_set_y, classes=[0, 1])
-    print '\nFinished training naivebayes!\n'
+    print('\nFinished training naivebayes!\n')
     return clf
+
 
 def get_feature_vector(tweet):
     uni_feature_vector = []
     bi_feature_vector = []
     words = tweet.split()
-    for i in xrange(len(words) - 1):
+    for i in range(len(words) - 1):
         word = words[i]
         next_word = words[i + 1]
         if unigrams.get(word):
@@ -70,7 +72,7 @@ def get_feature_vector(tweet):
 
 def extract_features(tweets, batch_size=500, test_file=True, feat_type='presence'):
     num_batches = int(np.ceil(len(tweets) / float(batch_size)))
-    for i in xrange(num_batches):
+    for i in range(num_batches):
         batch = tweets[i * batch_size: (i + 1) * batch_size]
         features = lil_matrix((batch_size, VOCAB_SIZE))
         labels = np.zeros(batch_size)
@@ -115,7 +117,7 @@ def process_tweets(csv_file, test_file=True):
         list: Of tuples
     """
     tweets = []
-    print 'Generating feature vectors'
+    print('Generating feature vectors')
     with open(csv_file, 'r') as csv:
         lines = csv.readlines()
         total = len(lines)
@@ -130,7 +132,7 @@ def process_tweets(csv_file, test_file=True):
             else:
                 tweets.append((tweet_id, int(sentiment), feature_vector))
             utils.write_status(i + 1, total)
-    print '\n'
+    print('\n')
     return tweets
 
 

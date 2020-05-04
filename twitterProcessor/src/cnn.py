@@ -5,7 +5,7 @@ from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding, Flatten
 from keras.layers import Conv1D, GlobalMaxPooling1D
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-import utils
+from . import utils
 from keras.preprocessing.sequence import pad_sequences
 
 # Performs classification using CNN.
@@ -22,7 +22,7 @@ def get_glove_vectors(vocab):
     """
     Extracts glove vectors from seed file only for words present in vocab.
     """
-    print 'Looking for GLOVE seeds'
+    print('Looking for GLOVE seeds')
     glove_vectors = {}
     found = 0
     with open(GLOVE_FILE, 'r') as glove_file:
@@ -34,7 +34,7 @@ def get_glove_vectors(vocab):
                 vector = [float(e) for e in tokens[1:]]
                 glove_vectors[word] = np.array(vector)
                 found += 1
-    print '\n'
+    print('\n')
     return glove_vectors
 
 
@@ -61,7 +61,7 @@ def process_tweets(csv_file, test_file=True):
     """
     tweets = []
     labels = []
-    print 'Generating feature vectors'
+    print('Generating feature vectors')
     with open(csv_file, 'r') as csv:
         lines = csv.readlines()
         total = len(lines)
@@ -77,7 +77,7 @@ def process_tweets(csv_file, test_file=True):
                 tweets.append(feature_vector)
                 labels.append(int(sentiment))
             utils.write_status(i + 1, total)
-    print '\n'
+    print('\n')
     return tweets, np.array(labels)
 
 
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         model.fit(tweets, labels, batch_size=128, epochs=8, validation_split=0.1, shuffle=True, callbacks=[checkpoint, reduce_lr])
     else:
         model = load_model(sys.argv[1])
-        print model.summary()
+        print(model.summary())
         test_tweets, _ = process_tweets(TEST_PROCESSED_FILE, test_file=True)
         test_tweets = pad_sequences(test_tweets, maxlen=max_length, padding='post')
         predictions = model.predict(test_tweets, batch_size=128, verbose=1)
